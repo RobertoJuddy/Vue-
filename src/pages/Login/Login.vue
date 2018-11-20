@@ -131,6 +131,9 @@
             return MessageBox.alert('请输入正确验证码')
           }
           result = await reqPwdLogin({name, pwd, captcha})
+          if(result.code !==0 ){
+            this.updateCaptch()
+          }
         }
 
         if (result.code === 0) {

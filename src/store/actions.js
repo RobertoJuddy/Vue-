@@ -1,6 +1,24 @@
-import {reqAddress, reqFoodCategorys, reqShops, reqUserInfo,reqLogout} from '../api'
+import {
+  reqAddress,
+  reqFoodCategorys,
+  reqShops,
+  reqUserInfo,
+  reqLogout,
+  reqShopGoods,
+  reqShopInfo,
+  reqShopRatings
+} from '../api'
 
-import {RECEIVE_SHOPS, RECEIVE_CATEGORYS, RECEIVE_ADDRESS, RECEIVE_USER,RESET_USER} from './mutation-types'
+import {
+  RECEIVE_SHOPS,
+  RECEIVE_CATEGORYS,
+  RECEIVE_ADDRESS,
+  RECEIVE_USER,
+  RESET_USER,
+  RECEIVE_RATINGS,
+  RECEIVE_INFO,
+  RECEIVE_GOODS
+} from './mutation-types'
 
 export default {
 
@@ -30,10 +48,12 @@ export default {
     }
   },
 
+  //保存user
   saveUser({commit}, user) {
     commit(RECEIVE_USER, {user})
   },
 
+  //获取商铺信息
   async getUserInfo({commit}) {
     const result = await reqUserInfo()
     if (result.code === 0) {
@@ -42,12 +62,40 @@ export default {
     }
   },
 
+  //登出
   async logout ({commit}){
     const result = await reqLogout()
     if(result.code === 0 ){
       commit (RESET_USER)
     }
-  }
+  },
+
+  async getShopInfo({commit}) {
+    const result = await reqShopInfo()
+    if(result.code===0) {
+      const info = result.data
+      info.score = 3.5
+      commit(RECEIVE_INFO, {info})
+    }
+  },
+
+// 异步获取商家评价列表
+  async getShopRatings({commit}) {
+    const result = await reqShopRatings()
+    if(result.code===0) {
+      const ratings = result.data
+      commit(RECEIVE_RATINGS, {ratings})
+    }
+  },
+
+// 异步获取商家商品列表
+  async getShopGoods({commit}) {
+    const result = await reqShopGoods()
+    if(result.code===0) {
+      const goods = result.data
+      commit(RECEIVE_GOODS, {goods})
+    }
+  },
 
 
 }

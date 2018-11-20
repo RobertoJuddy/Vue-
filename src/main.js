@@ -9,7 +9,7 @@ import { Button } from 'mint-ui';
 Vue.component(Button.name, Button);
 
 Vue.component('TopHeader', TopHeader)
-
+import './mock/MockServe'
 
 new Vue({
   el:'#app',

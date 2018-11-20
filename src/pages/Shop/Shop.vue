@@ -19,7 +19,12 @@
   export default {
     components: {
       ShopHeader
-    }
+    },
+    mounted () {
+      this.$store.dispatch('getShopInfo')
+      this.$store.dispatch('getShopRatings')
+      this.$store.dispatch('getShopGoods')
+    },
   }
 </script>
 
