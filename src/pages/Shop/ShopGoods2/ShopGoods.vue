@@ -36,7 +36,7 @@
                     <span class="now">￥{{food.price}}</span>
                   </div>
                   <div class="cartcontrol-wrapper">
-                    <CartControl :food="food"/>
+                    CartControl组件
                   </div>
                 </div>
               </li>
@@ -44,7 +44,6 @@
           </li>
         </ul>
       </div>
-      <ShopCart />
     </div>
   </div>
 </template>
@@ -52,90 +51,86 @@
 <script>
   import {mapState} from 'vuex'
   import BScroll from 'better-scroll'
-  import CartControl from '../../../component/CartControl/CartControl'
-  import ShopCart from '../../../component/ShopCart/ShopCart'
 
   export default {
     data () {
       return {
-        tops : [],
-        scrollY : 0
+        tops: [],
+        scrollY: 0
+
       }
     },
-
     computed: {
       ...mapState(['goods']),
 
       currentIndex () {
-        const {tops ,scrollY} = this
-        const index = tops.findIndex((top,index) => {
-          return scrollY >= top && scrollY < tops[index+1]
+        //滑动右边左边颜色跟着跳转
+        const {tops, scrollY} = this
+        const index = tops.findIndex((top, index) => {
+          return scrollY >= top && scrollY < tops[index + 1]
         })
-        if(this.index !== index && this.leftScroll){
+        //滑动右边左边跟着响应的移动
+        if (this.index !== index && this.leftScroll) {
           this.index = index
-
           const li = this.$refs.LeftUl.children[index]
           this.leftScroll.scrollToElement(li, 300)
         }
-
         return index
-
       }
     },
     mounted () {
-      this.$store.dispatch('getShopGoods' ,()=>{
-
-        this.$nextTick(()=>{
+      //等加载完成后在执行异步的滑动
+      this.$store.dispatch('getShopGoods', () => {
+        this.$nextTick(() => {
           this._initScroll(),
             this._initTops()
         })
-
       })
     },
-    methods:{
-      _initScroll() {
-        this.leftScroll = new BScroll('.menu-wrapper' ,{
-          click : true
+    methods: {
+      _initScroll () {
+        this.leftScroll = new BScroll('.menu-wrapper', {
+          click: true
         })
-
-        this.rightScroll = new BScroll('.foods-wrapper',{
-          click : true,
-          probeType : 1
+        this.rightScroll = new BScroll('.foods-wrapper', {
+          probeType: 1,
+          click: true
         })
-        this.rightScroll.on('scroll',({x,y}) => {
-          this.scrollY = Math.abs(y)
-        })
-        this.rightScroll.on('scrollEnd',({x,y}) => {
+        //滑动右边左边颜色跟着跳转
+        this.rightScroll.on('scroll', ({x, y}) => {
           this.scrollY = Math.abs(y)
         })
 
+        this.rightScroll.on('scrollEnd', ({x, y}) => {
+          this.scrollY = Math.abs(y)
+        })
       },
 
-      _initTops() {
+      clickItem (index) {
+        //点击左边，右边跟着滑动
+        const y = -this.tops[index]
+        this.scrollY = -y
+        this.rightScroll.scrollTo(0, y, 500)
+      },
+
+      _initTops () {
+        //滑动右边左边颜色跟着跳转
         const lis = this.$refs.rightUl.getElementsByClassName('food-list-hook')
         let tops = []
         let top = 0
         tops.push(top)
-        Array.prototype.slice.call(lis).forEach(li=>{
+        Array.prototype.slice.call(lis).forEach(li => {
           top += li.clientHeight
           tops.push(top)
         })
         this.tops = tops
-      },
-
-      clickItem (index) {
-        const y = -this.tops[index]
-        //为了立即更新scrollY，没有延迟
-        this.scrollY = -y
-        this.rightScroll.scrollTo(0,y,500)
-
       }
-    },
-    components : {
-      CartControl,
-      ShopCart
+
     }
+
   }
+
+
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">

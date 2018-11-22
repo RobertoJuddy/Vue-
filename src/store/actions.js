@@ -17,7 +17,10 @@ import {
   RESET_USER,
   RECEIVE_RATINGS,
   RECEIVE_INFO,
-  RECEIVE_GOODS
+  RECEIVE_GOODS,
+  ADD_FOODS_COUNT,
+  REDUCE_FOODS_COUNT,
+  Empty_CART
 } from './mutation-types'
 
 export default {
@@ -97,6 +100,19 @@ export default {
       typeof cb === 'function' && cb()
     }
   },
+
+  updateCount({commit},{food ,isAdd}) {
+    if(isAdd){
+      commit(ADD_FOODS_COUNT,{food})
+    }else{
+      commit(REDUCE_FOODS_COUNT,{food})
+    }
+
+  },
+
+  clearCart({commit}) {
+    commit(Empty_CART)
+  }
 
 
 }

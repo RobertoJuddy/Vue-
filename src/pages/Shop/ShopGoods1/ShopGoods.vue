@@ -3,9 +3,8 @@
     <div class="goods">
       <div class="menu-wrapper">
         <ul ref="LeftUl">
-          <li class="menu-item"
-              :class="{current:index === currentIndex}"
-              v-for="(good ,index) in goods"
+          <li class="menu-item " :class="{current:index === currentIndex}"
+              v-for="(good,index) in goods"
               :key="index"
               @click="clickItem(index)"
           >
@@ -17,7 +16,7 @@
         </ul>
       </div>
       <div class="foods-wrapper">
-        <ul ref="rightUl">
+        <ul ref="RightUl">
           <li class="food-list-hook" v-for="(good ,index) in goods" :key="index">
             <h1 class="title">{{good.name}}</h1>
             <ul>
@@ -34,17 +33,18 @@
                     <span>好评率{{food.rating}}%</span></div>
                   <div class="price">
                     <span class="now">￥{{food.price}}</span>
+                    <span class="old" v-if="food.oldPrice">￥{{food.oldPrice}}</span>
                   </div>
                   <div class="cartcontrol-wrapper">
-                    <CartControl :food="food"/>
+                    CartControl组件
                   </div>
                 </div>
               </li>
+
             </ul>
           </li>
         </ul>
       </div>
-      <ShopCart />
     </div>
   </div>
 </template>
@@ -52,88 +52,76 @@
 <script>
   import {mapState} from 'vuex'
   import BScroll from 'better-scroll'
-  import CartControl from '../../../component/CartControl/CartControl'
-  import ShopCart from '../../../component/ShopCart/ShopCart'
-
   export default {
     data () {
-      return {
-        tops : [],
-        scrollY : 0
-      }
+     return {
+       scrollY : 0,
+       tops : []
+     }
     },
-
-    computed: {
+    computed : {
       ...mapState(['goods']),
 
-      currentIndex () {
-        const {tops ,scrollY} = this
-        const index = tops.findIndex((top,index) => {
-          return scrollY >= top && scrollY < tops[index+1]
-        })
-        if(this.index !== index && this.leftScroll){
-          this.index = index
+       currentIndex () {
+         const {scrollY ,tops} = this
 
-          const li = this.$refs.LeftUl.children[index]
-          this.leftScroll.scrollToElement(li, 300)
-        }
+         const index = tops.findIndex((top,index)=>{
+         return scrollY >= top && scrollY < tops[index+1]
+         })
 
-        return index
-
-      }
+         if(this.index !==index && this.leftScroll) {
+           this.index = index
+           // 将index对应的左侧li滚动到最上面(尽量)
+           const li = this.$refs.LeftUl.children[index]
+           this.leftScroll.scrollToElement(li, 300)
+         }
+         return index
+       }
     },
-    mounted () {
+    mounted(){
       this.$store.dispatch('getShopGoods' ,()=>{
-
         this.$nextTick(()=>{
           this._initScroll(),
-            this._initTops()
+          this._initTops()
         })
-
       })
     },
     methods:{
-      _initScroll() {
-        this.leftScroll = new BScroll('.menu-wrapper' ,{
+      _initScroll () {
+        this.leftScroll = new BScroll('.menu-wrapper', {
           click : true
         })
+       this.rightScroll = new BScroll('.foods-wrapper', {
+         probeType: 1,
+         click : true
+        })
 
-        this.rightScroll = new BScroll('.foods-wrapper',{
-          click : true,
-          probeType : 1
-        })
-        this.rightScroll.on('scroll',({x,y}) => {
-          this.scrollY = Math.abs(y)
-        })
-        this.rightScroll.on('scrollEnd',({x,y}) => {
+        this.rightScroll.on('scroll',({x,y})=>{
           this.scrollY = Math.abs(y)
         })
 
+        this.rightScroll.on('scrollEnd',({x,y})=>{
+          this.scrollY = Math.abs(y)
+        })
       },
 
-      _initTops() {
-        const lis = this.$refs.rightUl.getElementsByClassName('food-list-hook')
+      _initTops () {
+        const lis =this.$refs.RightUl.getElementsByClassName('food-list-hook')
         let tops = []
         let top = 0
         tops.push(top)
         Array.prototype.slice.call(lis).forEach(li=>{
-          top += li.clientHeight
+          top +=li.clientHeight
           tops.push(top)
         })
         this.tops = tops
       },
 
       clickItem (index) {
-        const y = -this.tops[index]
-        //为了立即更新scrollY，没有延迟
+        const y = - this.tops[index]
         this.scrollY = -y
         this.rightScroll.scrollTo(0,y,500)
-
       }
-    },
-    components : {
-      CartControl,
-      ShopCart
     }
   }
 </script>

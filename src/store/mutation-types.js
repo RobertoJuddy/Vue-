@@ -13,3 +13,9 @@ export const RECEIVE_GOODS = 'receive_goods'
 export const RECEIVE_INFO = 'receive_info'
 
 export const RECEIVE_RATINGS = 'receive_ratings'
+
+export const ADD_FOODS_COUNT = 'add_foods_count'
+
+export const REDUCE_FOODS_COUNT = 'reduce_foods_count'
+
+export const Empty_CART = 'empty_cart'
