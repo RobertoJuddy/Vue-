@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="shopcart" >
+    <div class="shopcart">
       <div class="content">
         <div class="content-left" @click="isShow">
           <div class="logo-wrapper">
@@ -18,73 +18,106 @@
           </div>
         </div>
       </div>
-      <div class="shopcart-list" v-if="isShown">
-        <div class="list-header">
-          <h1 class="title">购物车</h1>
-          <span class="empty" @click="clearCart">清空</span>
+      <transition name="move">
+        <div class="shopcart-list" v-show="ListShow">
+          <div class="list-header">
+            <h1 class="title">购物车</h1>
+            <span class="empty" @click="clearCart">清空</span>
+          </div>
+
+          <div class="list-content">
+            <ul ref="foodUl">
+              <li class="food" v-for="(food ,index) in cartFoods" :key="index">
+                <span class="name">{{food.name}}</span>
+                <div class="price"><span>￥{{food.price}}</span></div>
+                <div class="cartcontrol-wrapper">
+                  <CartControl :food="food"/>
+                </div>
+              </li>
+            </ul>
+          </div>
         </div>
-        <div class="list-content">
-          <ul ref="foodUl">
-            <li class="food" v-for="(food ,index) in cartFoods" :key="index">
-              <span class="name">{{food.name}}</span>
-              <div class="price"><span>￥{{food.price}}</span></div>
-              <div class="cartcontrol-wrapper">
-               <CartControl :food="food"/>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </div>
+      </transition>
+
     </div>
-    <div class="list-mask" v-if="isShown" @click="isShow"></div>
+    <transition name="fade">
+      <div class="list-mask" v-show="ListShow" @click="isShow"></div>
+    </transition>
+
   </div>
 </template>
 
 <script>
-  import {mapState,mapGetters} from 'vuex'
+  import {mapState, mapGetters} from 'vuex'
   import CartControl from '../CartControl/CartControl'
-  import { MessageBox } from 'mint-ui'
+  import {MessageBox} from 'mint-ui'
   import BScroll from 'better-scroll'
-  export default {
 
+  export default {
 
     data () {
       return {
-        isShown : false
+        isShown: false
       }
     },
-    computed : {
-      ...mapState(['cartFoods','info']),
-      ...mapGetters(['totalPrice','totalCount']),
+    computed: {
+      ...mapState(['cartFoods', 'info']),
+      ...mapGetters(['totalPrice', 'totalCount']),
 
       PayText () {
 
-        if(this.totalPrice === 0){
+        if (this.totalPrice === 0) {
           return `还差${this.info.minPrice}元起送`
-        }else if(this.totalPrice < this.info.minPrice ){
+        } else if (this.totalPrice < this.info.minPrice) {
           return `还差${this.info.minPrice - this.totalPrice}元起送`
-        }else{
+        } else {
           return '请结算'
         }
       },
-      PayStyle() {
-        if(this.totalPrice >= this.info.minPrice){
+      PayStyle () {
+        if (this.totalPrice >= this.info.minPrice) {
           return 'enough'
-        }else{
+        } else {
           return 'no-enough'
         }
+      },
+
+
+      ListShow () {
+        if(this.totalCount === 0 ){
+          this.isShown = false
+          return false
+        }
+
+        if(this.isShown){
+          this.$nextTick(()=>{
+           if(!this.scroll){
+
+             this.scroll = new BScroll('.list-content' ,{
+               click : true
+             })
+           }else{
+             this.scroll.refresh()
+           }
+
+          })
+        }
+
+        return this.isShown
       }
 
     },
-    methods:{
+    methods: {
       isShow () {
-        this.isShown = !this.isShown
+        if(this.totalCount>0){
+          this.isShown = !this.isShown
+        }
       },
       clearCart () {
         MessageBox.confirm('你确定要清除购物车吗？').then(action => {
           this.$store.dispatch('clearCart')
           this.isShown = false
-        });
+        })
 
       }
     },
@@ -190,6 +223,10 @@
       z-index: -1
       width: 100%
       transform translateY(-100%)
+      &.move-enter-active,&.move-leave-active
+        transition transform .5s
+      &.move-enter,&.move-leave-to
+        transform translateY(0)
       .list-header
         height: 40px
         line-height: 40px
@@ -243,7 +280,7 @@
     opacity: 1
     background: rgba(7, 17, 27, 0.6)
     &.fade-enter-active, &.fade-leave-active
-      transition: all 0.5s
+      transition: opacity 0.5s
     &.fade-enter, &.fade-leave-to
       opacity: 0
 </style>

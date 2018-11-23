@@ -44,7 +44,7 @@
           </li>
         </ul>
       </div>
-      <ShopCart />
+      <ShopCart/>
     </div>
   </div>
 </template>
@@ -58,8 +58,8 @@
   export default {
     data () {
       return {
-        tops : [],
-        scrollY : 0
+        tops: [],
+        scrollY: 0
       }
     },
 
@@ -67,11 +67,11 @@
       ...mapState(['goods']),
 
       currentIndex () {
-        const {tops ,scrollY} = this
-        const index = tops.findIndex((top,index) => {
-          return scrollY >= top && scrollY < tops[index+1]
+        const {tops, scrollY} = this
+        const index = tops.findIndex((top, index) => {
+          return scrollY >= top && scrollY < tops[index + 1]
         })
-        if(this.index !== index && this.leftScroll){
+        if (this.index !== index && this.leftScroll) {
           this.index = index
 
           const li = this.$refs.LeftUl.children[index]
@@ -83,40 +83,40 @@
       }
     },
     mounted () {
-      this.$store.dispatch('getShopGoods' ,()=>{
+      this.$store.dispatch('getShopGoods', () => {
 
-        this.$nextTick(()=>{
-          this._initScroll(),
-            this._initTops()
+        this.$nextTick(() => {
+          this._initScroll()
+          this._initTops()
         })
 
       })
     },
-    methods:{
-      _initScroll() {
-        this.leftScroll = new BScroll('.menu-wrapper' ,{
-          click : true
+    methods: {
+      _initScroll () {
+        this.leftScroll = new BScroll('.menu-wrapper', {
+          click: true
         })
 
-        this.rightScroll = new BScroll('.foods-wrapper',{
-          click : true,
-          probeType : 1
+        this.rightScroll = new BScroll('.foods-wrapper', {
+          click: true,
+          probeType: 1
         })
-        this.rightScroll.on('scroll',({x,y}) => {
+        this.rightScroll.on('scroll', ({x, y}) => {
           this.scrollY = Math.abs(y)
         })
-        this.rightScroll.on('scrollEnd',({x,y}) => {
+        this.rightScroll.on('scrollEnd', ({x, y}) => {
           this.scrollY = Math.abs(y)
         })
 
       },
 
-      _initTops() {
+      _initTops () {
         const lis = this.$refs.rightUl.getElementsByClassName('food-list-hook')
         let tops = []
         let top = 0
         tops.push(top)
-        Array.prototype.slice.call(lis).forEach(li=>{
+        Array.prototype.slice.call(lis).forEach(li => {
           top += li.clientHeight
           tops.push(top)
         })
@@ -127,11 +127,11 @@
         const y = -this.tops[index]
         //为了立即更新scrollY，没有延迟
         this.scrollY = -y
-        this.rightScroll.scrollTo(0,y,500)
+        this.rightScroll.scrollTo(0, y, 500)
 
       }
     },
-    components : {
+    components: {
       CartControl,
       ShopCart
     }

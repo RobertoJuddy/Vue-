@@ -38,22 +38,31 @@ export default {
     state.info = info
   },
 
+  //点击增加购物车数量
   [ADD_FOODS_COUNT] (state,{food}){
     if(food.count){
       food.count++
     }else{
+      //为了可以使自定义的count属性有数据绑定
       Vue.set(food ,'count' ,1)
+      //把新增的food放到购物车cartFoods里
       state.cartFoods.push(food)
     }
   },
+
+  //点击减少购物车数量
   [REDUCE_FOODS_COUNT] (state,{food}){
     if(food.count){
       food.count--
     }
+    //当购物车数量清空时候，清空购物车里面的cartFoods
     if(food.count === 0){
       state.cartFoods.splice(state.cartFoods.indexOf(food) ,1)
+
     }
   },
+
+  //清空购物车
   [Empty_CART](state){
     state.cartFoods.forEach((food)=>{
       food.count = 0
