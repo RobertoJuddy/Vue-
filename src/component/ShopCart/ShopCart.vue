@@ -24,7 +24,6 @@
             <h1 class="title">购物车</h1>
             <span class="empty" @click="clearCart">清空</span>
           </div>
-
           <div class="list-content">
             <ul ref="foodUl">
               <li class="food" v-for="(food ,index) in cartFoods" :key="index">
@@ -38,12 +37,10 @@
           </div>
         </div>
       </transition>
-
     </div>
     <transition name="fade">
       <div class="list-mask" v-show="ListShow" @click="isShow"></div>
     </transition>
-
   </div>
 </template>
 
