@@ -19,7 +19,7 @@
         </div>
       </div>
       <transition name="move">
-        <div class="shopcart-list" v-show="ListShow">
+        <div class="shopcart-list" v-show="ListShow" >
           <div class="list-header">
             <h1 class="title">购物车</h1>
             <span class="empty" @click="clearCart">清空</span>

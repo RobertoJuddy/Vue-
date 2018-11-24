@@ -14,6 +14,7 @@ Vue.component('TopHeader', TopHeader)
 Vue.component('Split', Split)
 
 import './mock/MockServe'
+import './filters'
 
 new Vue({
   el:'#app',

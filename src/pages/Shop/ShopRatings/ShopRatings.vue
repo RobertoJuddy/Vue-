@@ -24,27 +24,30 @@
         </div>
       </div>
 
-      <Split />
+      <Split/>
 
-      <div>RatingSelect组件</div>
+      <RatingFilter :onlyContent="onlyContent"
+                    :selectType="selectType"
+                    @setSelectType="setSelectType"
+                    @toggleOnlyContent="toggleOnlyContent"/>
 
       <div class="rating-wrapper">
         <ul>
-          <li class="rating-item">
+          <li class="rating-item" v-for="(rating,index) in filterRatings" :key="index">
             <div class="avatar">
-              <img width="28" height="28" src="http://static.galileo.xiaojukeji.com/static/tms/default_header.png">
+              <img width="28" height="28" :src="rating.avatar">
             </div>
             <div class="content">
-              <h1 class="name">xxx</h1>
+              <h1 class="name">{{rating.username}}</h1>
               <div class="star-wrapper">
-                <div>Star组件</div>
-                <span class="delivery">222</span>
+                <Star :score="rating.score" :size="36"/>
+                <span class="delivery">{{rating.deliveryTime}}</span>
               </div>
-              <p class="text">还可以</p>
+              <p class="text">{{rating.text}}</p>
               <div class="recommend">
-                <span class="iconfont icon-thumb_up"></span>
+                <span class="iconfont " :class="rating.rateType ===0 ? 'icon-thumb_up' : 'icon-thumb_down'"></span>
               </div>
-              <div class="time">111</div>
+              <div class="time">{{rating.rateTime | date-format}}</div>
             </div>
           </li>
         </ul>
@@ -56,12 +59,51 @@
 <script>
   import {mapState} from 'vuex'
   import Star from '../../../component/star/star'
+  import BScroll from 'better-scroll'
+  import RatingFilter from '../../../component/RatingFilter/RatingFilter'
+
   export default {
-    computed : {
-      ...mapState(['info'])
+    data () {
+      return {
+        onlyContent: true,
+        selectType: 0, // 选择显示的类型  0: 满意, 1: 不满意, 2: 全部
+      }
+
     },
-    components : {
-      Star
+    mounted () {
+      this.$store.dispatch('getShopRatings', () => {
+        //nextTick保证组件加载完了才创建BScroll对象，才能滑动
+        this.$nextTick(() => {
+          new BScroll('.ratings', {
+            click: true
+          })
+        })
+      })
+    },
+    computed: {
+      ...mapState(['info', 'ratings']),
+
+      filterRatings () {
+        const {onlyContent, selectType, ratings} = this
+        return ratings.filter(rating => {
+
+          return (selectType === 2 || selectType === rating.rateType) && (onlyContent === false || rating.text.length > 0)
+        })
+      }
+
+    },
+    components: {
+      Star,
+      RatingFilter
+    },
+    methods: {
+      setSelectType (selectType) {
+        this.selectType = selectType
+      },
+
+      toggleOnlyContent () {
+        this.onlyContent = !this.onlyContent
+      }
     }
   }
 </script>
@@ -183,7 +225,7 @@
               margin: 0 8px 4px 0
               font-size: 9px
             .icon-thumb_up
-              color: $yellow
+              color: orange
             .icon-thumb_down
               color: rgb(147, 153, 159)
 
